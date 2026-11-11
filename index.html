@@ -75,5 +75,106 @@
             </div>
         </a>
     </main>
+
+    <!-- Nova Seção: Gerenciador de Tarefas -->
+    <section class="task-manager-section">
+        <div class="task-manager-box">
+            <h2>📝 Minhas Tarefas Diárias</h2>
+            
+            <form id="task-form" class="task-form">
+                <input type="text" id="task-desc" placeholder="O que você precisa fazer?" required>
+                
+                <select id="task-category" required>
+                    <option value="" disabled selected>Categoria</option>
+                    <option value="Academia">🏋️‍♂️ Academia</option>
+                    <option value="Saúde">🥗 Saúde</option>
+                    <option value="Estudo">📚 Estudo</option>
+                    <option value="Trabalho">💼 Trabalho</option>
+                    <option value="Lazer">🎮 Lazer</option>
+                    <option value="Hobby">🎨 Hobby</option>
+                </select>
+
+                <input type="time" id="task-time" required>
+                
+                <button type="submit">Adicionar</button>
+            </form>
+
+            <div id="task-list" class="task-list">
+                <!-- As tarefas aparecerão aqui via JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- JAVASCRIPT: Gerenciamento e Ordenação de Tarefas -->
+    <script>
+        // Array para armazenar as tarefas
+        let tarefas = [];
+
+        const taskForm = document.getElementById('task-form');
+        const taskList = document.getElementById('task-list');
+
+        // Evento de envio do formulário
+        taskForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Evita que a página recarregue
+
+            // Captura os valores
+            const desc = document.getElementById('task-desc').value;
+            const category = document.getElementById('task-category').value;
+            const time = document.getElementById('task-time').value;
+
+            // Cria o objeto da tarefa
+            const novaTarefa = {
+                id: Date.now(),
+                desc: desc,
+                category: category,
+                time: time
+            };
+
+            // Adiciona ao array
+            tarefas.push(novaTarefa);
+
+            // Ordena as tarefas pelo horário (do mais cedo pro mais tarde)
+            tarefas.sort((a, b) => a.time.localeCompare(b.time));
+
+            // Atualiza a tela
+            renderizarTarefas();
+
+            // Limpa o formulário
+            taskForm.reset();
+        });
+
+        // Função para desenhar as tarefas na tela
+        function renderizarTarefas() {
+            taskList.innerHTML = ''; // Limpa a lista atual
+
+            if(tarefas.length === 0) {
+                taskList.innerHTML = '<p class="empty-msg">Nenhuma tarefa agendada.</p>';
+                return;
+            }
+
+            tarefas.forEach(tarefa => {
+                // Cria o elemento da tarefa
+                const div = document.createElement('div');
+                div.className = 'task-item';
+                
+                div.innerHTML = `
+                    <div class="task-info">
+                        <span class="task-time">⏰ ${tarefa.time}</span>
+                        <span class="task-cat badge-${tarefa.category.toLowerCase()}">${tarefa.category}</span>
+                        <span class="task-text">${tarefa.desc}</span>
+                    </div>
+                    <button class="btn-delete" onclick="removerTarefa(${tarefa.id})">❌</button>
+                `;
+
+                taskList.appendChild(div);
+            });
+        }
+
+        // Função para remover uma tarefa
+        function removerTarefa(id) {
+            tarefas = tarefas.filter(tarefa => tarefa.id !== id);
+            renderizarTarefas();
+        }
+    </script>
 </body>
 </html>
